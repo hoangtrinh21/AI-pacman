@@ -454,7 +454,16 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    max = 0
+    if problem.isGoalState(state):
+        return 0
+    for food in foodGrid.asList():
+        #dùng hàm mazeDistance đã viết để tìm khoảng cách giữa vị trí của Pacman và thức ăn
+        space = mazeDistance(position, food, problem.startingGameState)
+        #lấy giá trị max
+        if space > max:
+            max = space
+    return max
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -483,9 +492,9 @@ class ClosestDotSearchAgent(SearchAgent):
         food = gameState.getFood()
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #sử dụng thuật toán A* để tìm ra đường đi đến food gần nhất
+        return search.astar(problem, heuristic=search.nullHeuristic)
+        # util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -521,7 +530,8 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[x][y]
+        # util.raiseNotDefined()
 
 def mazeDistance(point1, point2, gameState):
     """
