@@ -87,57 +87,16 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    visited = set()
-    stack = util.Stack()
-    stack.push((problem.getStartState(), []))
-    while not stack.isEmpty():
-        state, actions = stack.pop()
-        if problem.isGoalState(state):
-            return actions
-        visited.add(state)
-        for next_node in problem.getSuccessors(state):
-            nextState, nextAction, cost = next_node
-            if nextState not in visited:
-                stack.push((nextState,actions+[nextAction]))
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
-    visited.add(problem.getStartState())
-    stack = util.Stack()
-    stack.push((problem.getStartState(), []))
-    while not stack.isEmpty():
-        temp = util.Stack()
-        while not stack.isEmpty():
-            state, actions = stack.pop()
-            if problem.isGoalState(state):
-                return actions
-            for next_node in problem.getSuccessors(state):
-                nextState, nextAction, cost = next_node
-                if nextState not in visited:
-                    temp.push((nextState,actions+[nextAction]))
-                    visited.add(nextState)
-        stack = temp
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
-    queue = util.PriorityQueue()
-    queue.push((problem.getStartState(),[],0),0)
-    while not queue.isEmpty():
-        state, actions, total_cost = queue.pop()
-        if problem.isGoalState(state):
-            return actions
-        if state not in visited:
-            for next_node in problem.getSuccessors(state):
-                nextState, nextAction, cost = next_node
-                if nextState not in visited:
-                    queue.push((nextState,actions+[nextAction],total_cost+cost),total_cost+cost)
-            visited.add(state)
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
