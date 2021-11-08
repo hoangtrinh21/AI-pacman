@@ -143,6 +143,39 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+        maxValue = -float('inf')
+        bestAction = None
+        for action in gameState.getLegalActions(0):
+            #lấy action có giá trị lớn nhất trong list next action of gost
+            if self.minValueAction(gameState.generateSuccessor(0, action), 1, 0) > maxValue:
+                maxValue = self.minValueAction(gameState.generateSuccessor(0, action), 1, 0)
+                bestAction = action
+        return bestAction
+
+    def minValueAction(self, gameState, agentIndex, depth):
+        #giá trị của action của ma sẽ là giá trị nhỏ nhất của các con ma phía sau
+        minVal = float('inf')
+        if len(gameState.getLegalActions(agentIndex)) == 0 or gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+        if agentIndex < gameState.getNumAgents() - 1:
+            for action in gameState.getLegalActions(agentIndex):
+                if minVal > self.minValueAction(gameState.generateSuccessor(agentIndex, action), agentIndex + 1, depth):
+                    minVal = self.minValueAction(gameState.generateSuccessor(agentIndex, action), agentIndex + 1, depth)
+            return minVal
+        else: #đến con ma cuối thì sẽ chuyển sang depth sau và tìm min của pacman ở depth đó
+            for action in gameState.getLegalActions(agentIndex):
+                if minVal > self.maxValueAction(gameState.generateSuccessor(agentIndex, action), depth + 1):
+                    minVal = self.maxValueAction(gameState.generateSuccessor(agentIndex, action), depth + 1)
+            return minVal
+    def maxValueAction(self, gameState, depth):
+        #hàm lấy giá trị max cho action của pacman 
+        maxVal = -float('inf')
+        if len(gameState.getLegalActions(0)) == 0 or gameState.isWin() or gameState.isLose() or depth == self.depth:
+            return self.evaluationFunction(gameState)
+        for action in gameState.getLegalActions(0):
+            if maxVal < self.minValueAction(gameState.generateSuccessor(0, action), 1, depth):
+                maxVal = self.minValueAction(gameState.generateSuccessor(0, action), 1, depth)
+        return maxVal
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
