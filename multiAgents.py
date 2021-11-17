@@ -159,13 +159,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
             return self.evaluationFunction(gameState)
         if agentIndex < gameState.getNumAgents() - 1:
             for action in gameState.getLegalActions(agentIndex):
-                if minVal > self.minValueAction(gameState.generateSuccessor(agentIndex, action), agentIndex + 1, depth):
-                    minVal = self.minValueAction(gameState.generateSuccessor(agentIndex, action), agentIndex + 1, depth)
+                minVal = min(minVal, self.minValueAction(gameState.generateSuccessor(agentIndex, action), agentIndex + 1, depth))
             return minVal
         else: #đến con ma cuối thì sẽ chuyển sang depth sau và tìm min của pacman ở depth đó
             for action in gameState.getLegalActions(agentIndex):
-                if minVal > self.maxValueAction(gameState.generateSuccessor(agentIndex, action), depth + 1):
-                    minVal = self.maxValueAction(gameState.generateSuccessor(agentIndex, action), depth + 1)
+                minVal = min(minVal, self.maxValueAction(gameState.generateSuccessor(agentIndex, action), depth + 1))
             return minVal
     def maxValueAction(self, gameState, depth):
         #hàm lấy giá trị max cho action của pacman 
@@ -173,8 +171,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if len(gameState.getLegalActions(0)) == 0 or gameState.isWin() or gameState.isLose() or depth == self.depth:
             return self.evaluationFunction(gameState)
         for action in gameState.getLegalActions(0):
-            if maxVal < self.minValueAction(gameState.generateSuccessor(0, action), 1, depth):
-                maxVal = self.minValueAction(gameState.generateSuccessor(0, action), 1, depth)
+            maxVal = max(maxVal, self.minValueAction(gameState.generateSuccessor(0, action), 1, depth))
         return maxVal
         util.raiseNotDefined()
 
@@ -235,15 +232,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-            def getAction(self, gameState):
-        """
-          Returns the expectimax action using self.depth and self.evaluationFunction
-
-          All ghosts should be modeled as choosing uniformly at random from their
-          legal moves.
-        """
-        "*** YOUR CODE HERE ***"
-        # print gameState.getPacmanPosition()
+        # print gameState.getPacmanPosition()S
 
         def expectimax(gameState, agentIndex, currentDepth):
             agents = gameState.getNumAgents()
@@ -288,6 +277,40 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
+    if currentGameState.isWin() or len(currentGameState.getGhostStates()) == 0:
+        return float('inf')
+    if currentGameState.isLose():
+        return -float('inf')
+    score = 0
+    pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostStates = currentGameState.getGhostStates()
+    capsules = currentGameState.getCapsules()
+
+    minDistToGhost = float('inf')
+    for ghostState in ghostStates:
+        ghostPosition = ghostState.getPosition()
+        if manhattanDistance(ghostPosition,pos) < 2:
+            if ghostState.scaredTimer != 0:
+                score += 1000.0/(manhattanDistance(ghostPosition,pos) + 1)
+            else:
+                score -= 1000.0/(manhattanDistance(ghostPosition,pos) + 1)
+        minDistToGhost = min(minDistToGhost, manhattanDistance(pos, ghostState.getPosition()))
+
+    minDistToFood = float('inf')
+    for foodPosition in food.asList():
+        minDistToFood = min(minDistToFood, manhattanDistance(pos, foodPosition))
+
+    minDistToCapsule = float('inf')
+    for capsule in capsules:
+        minDistToCapsule = min(minDistToCapsule, manhattanDistance(capsule, pos))
+
+    if minDistToCapsule == 0:
+        score += 500.0
+    elif minDistToCapsule < 5:
+        score += 500.0/minDistToCapsule
+
+    return score + 10.0/minDistToFood - 10.0*food.count()
     util.raiseNotDefined()
 
 # Abbreviation
